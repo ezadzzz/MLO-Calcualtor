@@ -262,32 +262,6 @@
         border-left: 4px solid #4299e1;
     }
 
-    .winner {
-        background: linear-gradient(135deg, #f0fff4, #c6f6d5) !important;
-        border: 2px solid #38a169 !important;
-        position: relative;
-    }
-
-    .winner::before {
-        content: "⭐";
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 24px;
-        z-index: 1;
-    }
-
-    .winner::after {
-        content: "⭐";
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 24px;
-        z-index: 1;
-    }
-
     .big-number {
         font-size: 2.5rem;
         font-weight: 700;
@@ -492,7 +466,7 @@
                     <span class="tooltip" data-tooltip="Annual rate for present value calculations">i</span>
                 </div>
                 <div class="input-wrapper">
-                    <input type="range" id="discountRate" min="0" max="10" step="0.1" value="4.0">
+                    <input type="range" id="discountRate" min="0" max="12" step="0.1" value="4.0">
                     <span class="value-display" id="discountRateValue">4.0%</span>
                 </div>
             </div>
@@ -514,35 +488,59 @@
 
     <div class="assumptions-panel">
         <h3 class="panel-title">Mortgage Information</h3>
-        <div class="input-grid">
-            <div class="input-group">
-                <div class="input-label">
-                    <span>Current Balance</span>
-                    <span class="tooltip" data-tooltip="Remaining mortgage balance today">i</span>
+        <div class="mortgage-mode">
+            <div class="mode-toggle">
+                <div class="mode-option active" onclick="setMortgageMode('amortize')" id="mode-amortize">
+                    Mode A: Amortization
                 </div>
-                <div class="input-wrapper">
-                    <input type="number" id="currentBalance" value="30772" min="0" step="1000">
-                </div>
-            </div>
-            
-            <div class="input-group">
-                <div class="input-label">
-                    <span>APR</span>
-                    <span class="tooltip" data-tooltip="Annual percentage rate">i</span>
-                </div>
-                <div class="input-wrapper">
-                    <input type="range" id="mortgageAPR" min="0" max="10" step="0.01" value="2.68">
-                    <span class="value-display" id="mortgageAPRValue">2.68%</span>
+                <div class="mode-option" onclick="setMortgageMode('manual')" id="mode-manual">
+                    Mode B: Manual Override
                 </div>
             </div>
             
-            <div class="input-group">
-                <div class="input-label">
-                    <span>Monthly P&I Payment</span>
-                    <span class="tooltip" data-tooltip="Principal and interest payment">i</span>
+            <div class="input-grid" id="amortize-inputs">
+                <div class="input-group">
+                    <div class="input-label">
+                        <span>Current Balance</span>
+                        <span class="tooltip" data-tooltip="Remaining mortgage balance today">i</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="number" id="currentBalance" value="30772" min="0" step="1000">
+                    </div>
                 </div>
-                <div class="input-wrapper">
-                    <input type="number" id="monthlyPayment" value="1097.02" min="0" step="10">
+                
+                <div class="input-group">
+                    <div class="input-label">
+                        <span>APR</span>
+                        <span class="tooltip" data-tooltip="Annual percentage rate">i</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="range" id="mortgageAPR" min="0" max="10" step="0.01" value="2.68">
+                        <span class="value-display" id="mortgageAPRValue">2.68%</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <div class="input-label">
+                        <span>Monthly P&I Payment</span>
+                        <span class="tooltip" data-tooltip="Principal and interest payment">i</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="number" id="monthlyPayment" value="1097.02" min="0" step="10">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-grid" id="manual-inputs" style="display: none;">
+                <div class="input-group">
+                    <div class="input-label">
+                        <span>Months to Payoff</span>
+                        <span class="tooltip" data-tooltip="Manual override for payoff timeline">i</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="range" id="manualPayoffMonths" min="0" max="60" step="1" value="30">
+                        <span class="value-display" id="manualPayoffMonthsValue">30 months</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -600,45 +598,39 @@
                 </div>
             </div>
             
-            <div class="panel-title" style="margin-top: 25px;">Monthly Holding Costs</div>
-            <div class="input-grid">
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>Property Taxes</span>
-                        <span class="tooltip" data-tooltip="Monthly property tax cost">i</span>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="number" id="holdingTaxes" value="0" min="0" step="50">
-                    </div>
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleSection('holding-costs')">
+                    <span>Monthly Holding Costs (Optional)</span>
+                    <span>▼</span>
                 </div>
-                
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>Insurance</span>
-                        <span class="tooltip" data-tooltip="Monthly insurance cost">i</span>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="number" id="holdingInsurance" value="0" min="0" step="25">
-                    </div>
-                </div>
-                
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>Principal & Interest</span>
-                        <span class="tooltip" data-tooltip="Monthly mortgage payment">i</span>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="number" id="holdingPI" value="0" min="0" step="25">
-                    </div>
-                </div>
-                
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>Utilities</span>
-                        <span class="tooltip" data-tooltip="Monthly utility costs">i</span>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="number" id="holdingUtilities" value="0" min="0" step="25">
+                <div class="collapsible-content" id="holding-costs">
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <div class="input-label">
+                                <span>Property Taxes</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="holdingTaxes" value="0" min="0" step="50">
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <div class="input-label">
+                                <span>Insurance</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="holdingInsurance" value="0" min="0" step="25">
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <div class="input-label">
+                                <span>HOA/Other</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="holdingOther" value="0" min="0" step="25">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -679,7 +671,7 @@
                         <span class="tooltip" data-tooltip="Option exercise price">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="range" id="strikePrice" min="270000" max="300000" step="2500" value="282500">
+                        <input type="range" id="strikePrice" min="200000" max="400000" step="2500" value="282500">
                         <span class="value-display" id="strikePriceValue">$282,500</span>
                     </div>
                 </div>
@@ -724,6 +716,14 @@
                 </div>
             </div>
             
+            <div class="big-result">
+                <div class="big-number" id="mloClosing" style="font-size: 1.8rem;">$266,175</div>
+                <div class="big-label">Closing Proceeds</div>
+                <div class="big-number" id="mloClosingPV" style="font-size: 1.2rem; margin-top: 5px; display: none;">
+                    PV: $266,175
+                </div>
+            </div>
+            
             <div class="result-details">
                 <h4 style="margin-bottom: 10px; color: #4a5568;">Interim Payments to Seller:</h4>
                 <div id="mloBreakdown">
@@ -747,7 +747,32 @@
 
 <script>
     // Global state
+    let mortgageMode = 'amortize';
     let payoffMonths = 0;
+    
+    // Default values for validation
+    const defaults = {
+        conveyanceTax: 1.0,
+        attorneyFee: 1500,
+        discountRate: 4.0,
+        showPV: false,
+        currentBalance: 30772,
+        mortgageAPR: 2.68,
+        monthlyPayment: 1097.02,
+        manualPayoffMonths: 30,
+        salePrice: 295000,
+        commission: 5.0,
+        fsbo: false,
+        saleTiming: 0,
+        holdingTaxes: 0,
+        holdingInsurance: 0,
+        holdingOther: 0,
+        exerciseTiming: 36,
+        strikePrice: 282500,
+        leasePayment: 1150,
+        optionFee: 2000,
+        improvementCredits: 10000
+    };
 
     // Utility functions
     function formatCurrency(amount) {
@@ -796,9 +821,16 @@
     }
 
     /**
-     * Get mortgage balance at specific month using amortization
+     * Get mortgage balance at specific month using amortization or manual mode
      */
     function mortgageBalanceAtMonth(month) {
+        if (mortgageMode === 'manual') {
+            const manualMonths = parseFloat(document.getElementById('manualPayoffMonths').value);
+            const currentBalance = parseFloat(document.getElementById('currentBalance').value);
+            if (month >= manualMonths) return 0;
+            return currentBalance * (1 - month / manualMonths);
+        }
+        
         const balance = parseFloat(document.getElementById('currentBalance').value);
         const apr = parseFloat(document.getElementById('mortgageAPR').value);
         const payment = parseFloat(document.getElementById('monthlyPayment').value);
@@ -832,9 +864,8 @@
         
         const holdingTaxes = parseFloat(document.getElementById('holdingTaxes').value);
         const holdingInsurance = parseFloat(document.getElementById('holdingInsurance').value);
-        const holdingPI = parseFloat(document.getElementById('holdingPI').value);
-        const holdingUtilities = parseFloat(document.getElementById('holdingUtilities').value);
-        const totalHoldingCosts = (holdingTaxes + holdingInsurance + holdingPI + holdingUtilities) * saleTiming;
+        const holdingOther = parseFloat(document.getElementById('holdingOther').value);
+        const totalHoldingCosts = (holdingTaxes + holdingInsurance + holdingOther) * saleTiming;
         
         const commission = salePrice * commissionRate / 100;
         const conveyanceTax = salePrice * conveyanceRate / 100;
@@ -871,8 +902,12 @@
         const apr = parseFloat(document.getElementById('mortgageAPR').value);
         const payment = parseFloat(document.getElementById('monthlyPayment').value);
         
-        const schedule = amortizeSchedule(balance, apr, payment);
-        payoffMonths = schedule.length;
+        if (mortgageMode === 'manual') {
+            payoffMonths = parseFloat(document.getElementById('manualPayoffMonths').value);
+        } else {
+            const schedule = amortizeSchedule(balance, apr, payment);
+            payoffMonths = schedule.length;
+        }
         
         // Calculate interim payments to seller
         let premiumWhileActive = 0;
@@ -925,7 +960,7 @@
     }
 
     /**
-     * Calculate present value of MLO cash flows with proper payoff calculation
+     * Calculate present value of all MLO cash flows
      */
     function calculateMLOPresentValue() {
         const discountRate = parseFloat(document.getElementById('discountRate').value);
@@ -933,13 +968,6 @@
         const leasePayment = parseFloat(document.getElementById('leasePayment').value);
         const optionFee = parseFloat(document.getElementById('optionFee').value);
         const monthlyPI = parseFloat(document.getElementById('monthlyPayment').value);
-        
-        // Calculate payoff months using amortization
-        const balance = parseFloat(document.getElementById('currentBalance').value);
-        const apr = parseFloat(document.getElementById('mortgageAPR').value);
-        const payment = parseFloat(document.getElementById('monthlyPayment').value);
-        const schedule = amortizeSchedule(balance, apr, payment);
-        const currentPayoffMonths = schedule.length;
         
         const mlo = calculateMLOTotals();
         
@@ -955,8 +983,8 @@
         }
         
         // Full lease payments after payoff
-        if (exerciseTiming > currentPayoffMonths) {
-            for (let month = currentPayoffMonths + 1; month <= exerciseTiming; month++) {
+        if (exerciseTiming > payoffMonths) {
+            for (let month = payoffMonths + 1; month <= exerciseTiming; month++) {
                 totalPV += presentValue(leasePayment, discountRate, month);
             }
         }
@@ -979,26 +1007,6 @@
         const sellTodayNetEl = document.getElementById('sellTodayNet');
         sellTodayNetEl.textContent = formatCurrency(sellToday.net);
         sellTodayNetEl.className = sellToday.net < 0 ? 'big-number negative' : 'big-number';
-        
-        // MLO calculations
-        const mlo = calculateMLOTotals();
-        const mloTotalEl = document.getElementById('mloTotal');
-        mloTotalEl.textContent = formatCurrency(mlo.totalToSeller);
-        
-        // Determine winner and apply styling
-        const sellTodayResultEl = sellTodayNetEl.closest('.big-result');
-        const mloTotalResultEl = mloTotalEl.closest('.big-result');
-        
-        // Remove existing winner classes
-        sellTodayResultEl.classList.remove('winner');
-        mloTotalResultEl.classList.remove('winner');
-        
-        // Add winner styling to the higher value
-        if (sellToday.net > mlo.totalToSeller) {
-            sellTodayResultEl.classList.add('winner');
-        } else if (mlo.totalToSeller > sellToday.net) {
-            mloTotalResultEl.classList.add('winner');
-        }
         
         // Sell Today PV
         const showPV = document.getElementById('showPV').checked;
@@ -1029,69 +1037,6 @@
                 <span class="result-value">-${formatCurrency(sellToday.conveyanceTax)}</span>
             </div>
             <div class="result-row">
-                <span class="result-label">Attorney Fee</span>
-                <span class="result-value">-${formatCurrency(sellToday.attorneyFee)}</span>
-            </div>
-            <div class="result-row">
-                <span class="result-label">Mortgage Payoff</span>
-                <span class="result-value">-${formatCurrency(sellToday.mortgagePayoff)}</span>
-            </div>
-            ${sellToday.holdingCosts > 0 ? `
-            <div class="result-row">
-                <span class="result-label">Holding Costs (${sellToday.timing} months)</span>
-                <span class="result-value">-${formatCurrency(sellToday.holdingCosts)}</span>
-            </div>
-            ` : ''}
-            <div class="result-row ${sellToday.net < 0 ? 'negative' : ''}">
-                <span class="result-label">Net at Closing</span>
-                <span class="result-value">${formatCurrency(sellToday.net)}</span>
-            </div>
-        `;
-        
-        // MLO PV calculations
-        const mloPVEl = document.getElementById('mloPV');
-        
-        if (showPV) {
-            const mloPV = calculateMLOPresentValue();
-            mloPVEl.textContent = `PV: ${formatCurrency(mloPV.totalPV)}`;
-            mloPVEl.style.display = 'block';
-        } else {
-            mloPVEl.style.display = 'none';
-        }
-        
-        // MLO breakdown
-        const mloBreakdown = document.getElementById('mloBreakdown');
-        mloBreakdown.innerHTML = `
-            <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
-                    <span style="color: #4a5568;">Option Fee (Month 0)</span>
-                    <span style="font-weight: 600;">${formatCurrency(mlo.optionFee)}</span>
-                </div>
-                ${mlo.activeMonths > 0 ? `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
-                    <span style="color: #4a5568;">Premiums while loan active (${mlo.activeMonths} months × ${formatCurrency(mlo.monthlyPremium)})</span>
-                    <span style="font-weight: 600;">${formatCurrency(mlo.premiumWhileActive)}</span>
-                </div>
-                ` : ''}
-                ${mlo.postPayoffMonths > 0 ? `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
-                    <span style="color: #4a5568;">Full lease after payoff (${mlo.postPayoffMonths} months × ${formatCurrency(parseFloat(document.getElementById('leasePayment').value))})</span>
-                    <span style="font-weight: 600;">${formatCurrency(mlo.postPayoffReceipts)}</span>
-                </div>
-                ` : ''}
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; margin-top: 8px; border-top: 2px solid #4299e1; font-weight: 600;">
-                    <span>Total Interim Payments</span>
-                    <span>${formatCurrency(mlo.interimPayments)}</span>
-                </div>
-            </div>
-            <div style="background: #f7fafc; padding: 12px; border-radius: 6px; font-size: 13px; color: #4a5568;">
-                <div>Mortgage payoff: ${mlo.payoffMonths} months</div>
-                <div>Exercise: ${mlo.exerciseTiming} months</div>
-                <div>Credits applied: ${formatCurrency(mlo.credits)}</div>
-                <div>Closing proceeds: ${formatCurrency(mlo.closingProceeds)}</div>
-            </div>
-        `;
-    }="result-row">
                 <span class="result-label">Attorney Fee</span>
                 <span class="result-value">-${formatCurrency(sellToday.attorneyFee)}</span>
             </div>
@@ -1171,7 +1116,7 @@
     function initializeInputs() {
         // Range inputs with value display
         const rangeInputs = [
-            'conveyanceTax', 'discountRate', 'mortgageAPR',
+            'conveyanceTax', 'discountRate', 'mortgageAPR', 'manualPayoffMonths',
             'salePrice', 'commission', 'saleTiming', 'exerciseTiming', 'strikePrice', 'improvementCredits'
         ];
         
@@ -1204,7 +1149,7 @@
         // Number inputs
         const numberInputs = [
             'attorneyFee', 'currentBalance', 'monthlyPayment', 'holdingTaxes',
-            'holdingInsurance', 'holdingPI', 'holdingUtilities', 'leasePayment', 'optionFee'
+            'holdingInsurance', 'holdingOther', 'leasePayment', 'optionFee'
         ];
         
         numberInputs.forEach(id => {
@@ -1230,6 +1175,40 @@
     }
 
     /**
+     * Toggle mortgage calculation mode
+     */
+    function setMortgageMode(mode) {
+        mortgageMode = mode;
+        
+        // Update UI
+        document.getElementById('mode-amortize').className = mode === 'amortize' ? 'mode-option active' : 'mode-option';
+        document.getElementById('mode-manual').className = mode === 'manual' ? 'mode-option active' : 'mode-option';
+        
+        // Show/hide input sections
+        document.getElementById('amortize-inputs').style.display = mode === 'amortize' ? 'grid' : 'none';
+        document.getElementById('manual-inputs').style.display = mode === 'manual' ? 'grid' : 'none';
+        
+        updateCalculations();
+    }
+
+    /**
+     * Toggle collapsible sections
+     */
+    function toggleSection(sectionId) {
+        const content = document.getElementById(sectionId);
+        const header = content.previousElementSibling;
+        const arrow = header.querySelector('span:last-child');
+        
+        if (content.classList.contains('show')) {
+            content.classList.remove('show');
+            arrow.textContent = '▼';
+        } else {
+            content.classList.add('show');
+            arrow.textContent = '▲';
+        }
+    }
+
+    /**
      * Toggle how-to section
      */
     function toggleHowTo() {
@@ -1249,30 +1228,7 @@
      * Reset all inputs to default values
      */
     function resetToDefaults() {
-        const updatedDefaults = {
-            conveyanceTax: 1.0,
-            attorneyFee: 1500,
-            discountRate: 4.0,
-            showPV: false,
-            currentBalance: 30772,
-            mortgageAPR: 2.68,
-            monthlyPayment: 1097.02,
-            salePrice: 295000,
-            commission: 5.0,
-            fsbo: false,
-            saleTiming: 0,
-            holdingTaxes: 0,
-            holdingInsurance: 0,
-            holdingPI: 0,
-            holdingUtilities: 0,
-            exerciseTiming: 36,
-            strikePrice: 282500,
-            leasePayment: 1150,
-            optionFee: 2000,
-            improvementCredits: 10000
-        };
-        
-        Object.entries(updatedDefaults).forEach(([key, value]) => {
+        Object.entries(defaults).forEach(([key, value]) => {
             const input = document.getElementById(key);
             if (input) {
                 if (input.type === 'checkbox') {
@@ -1289,17 +1245,22 @@
             }
         });
         
+        // Reset mortgage mode
+        setMortgageMode('amortize');
+        
         updateCalculations();
     }
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', () => {
         initializeInputs();
+        setMortgageMode('amortize');
         updateCalculations();
         
         console.log('=== VALIDATION SCENARIOS ===');
         console.log('Default settings should produce:');
         console.log('Sell Today Net: ~$244,800');
+        console.log('MLO Closing: ~$266,175 (low credits) to $261,175 (high credits)');
         console.log('MLO Total: ~$276,665 (low credits) to $271,665 (high credits)');
     });
 </script>
