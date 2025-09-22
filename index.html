@@ -1024,9 +1024,9 @@
             mloPVEl.style.display = 'none';
         }
         
-        // Winner highlighting - find scenario containers
-        const sellTodayResultEl = document.getElementById('sellTodayNet').closest('.scenario-card');
-        const mloResultEl = document.getElementById('mloTotal').closest('.scenario-card');
+        // Winner highlighting - find result boxes
+        const sellTodayResultEl = document.getElementById('sellTodayNet').closest('.big-result');
+        const mloResultEl = document.getElementById('mloTotal').closest('.big-result');
         
         // Remove existing winner highlighting from both containers
         sellTodayResultEl.classList.remove('winner-highlight');
