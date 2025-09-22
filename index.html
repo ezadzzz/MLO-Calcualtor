@@ -549,8 +549,8 @@
                         <span class="tooltip" data-tooltip="Months from today until sale">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="range" id="saleTiming" min="1" max="60" step="1" value="1">
-                        <span class="value-display" id="saleTimingValue">0 months</span>
+                        <input type="range" id="saleTiming" min="0" max="12" step="1" value="1">
+                        <span class="value-display" id="saleTimingValue">1 months</span>
                     </div>
                 </div>
             </div>
@@ -578,20 +578,11 @@
                     
                     <div class="input-group">
                         <div class="input-label">
-                            <span>Principal</span>
+                            <span>Interest</span>
                             <span class="tooltip" data-tooltip="Auto-calculated from mortgage payment">i</span>
                         </div>
                         <div class="input-wrapper">
-                            <input type="number" id="holdingPrincipal" value="1026" min="0" step="1" readonly>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <div class="input-label">
-                            <span>Interest</span>
-                        </div>
-                        <div class="input-wrapper">
-                            <input type="number" id="holdingInterest" value="71" min="0" step="1">
+                            <input type="number" id="holdingInterest" value="71" min="0" step="1" readonly>
                         </div>
                     </div>
                     
@@ -600,7 +591,7 @@
                             <span>Utilities</span>
                         </div>
                         <div class="input-wrapper">
-                            <input type="number" id="holdingUtilities" value="50" min="0" step="1">
+                            <input type="number" id="holdingUtilities" value="75" min="0" step="1">
                         </div>
                     </div>
                 </div>
@@ -729,9 +720,8 @@
         saleTiming: 0,
         holdingTaxes: 553,
         holdingInsurance: 142,
-        holdingPrincipal: 1026,
         holdingInterest: 71,
-        holdingUtilities: 50,
+        holdingUtilities: 75,
         exerciseTiming: 36,
         strikePrice: 285000,
         leasePayment: 1150,
@@ -755,7 +745,7 @@
 
     /**
      * Amortization calculation: compute month-by-month until balance <= 0
-     * Returns array of {month, balance, interest, principal}
+     * Returns array of {month, balance, interest}
      */
     function amortizeSchedule(balance, apr, payment) {
         const schedule = [];
@@ -810,7 +800,7 @@
     }
 
     /**
-     * Calculate dynamic Interest and Principal values based on mortgage info
+     * Calculate dynamic Interest values based on mortgage info
      */
     function calculateDynamicHoldingCosts() {
         const monthlyPayment = parseFloat(document.getElementById('monthlyPayment').value);
@@ -818,16 +808,6 @@
         const apr = parseFloat(document.getElementById('mortgageAPR').value);
         const saleTiming = parseInt(document.getElementById('saleTiming').value);
         
-        // Calculate monthly principal payment
-        let monthlyPrincipal = 0;
-        if (saleTiming > 0) {
-            const monthlyRate = apr / 100 / 12;
-            const interest = currentBalance * monthlyRate;
-            monthlyPrincipal = Math.max(0, monthlyPayment - interest);
-        }
-        
-        // Update the readonly fields
-        document.getElementById('holdingPrincipal').value = Math.round(monthlyPrincipal);
     }
     
     /**
@@ -843,10 +823,9 @@
         
         const holdingTaxes = parseFloat(document.getElementById('holdingTaxes').value);
         const holdingInsurance = parseFloat(document.getElementById('holdingInsurance').value);
-        const holdingPrincipal = parseFloat(document.getElementById('holdingPrincipal').value);
         const holdingInterest = parseFloat(document.getElementById('holdingInterest').value);
         const holdingUtilities = parseFloat(document.getElementById('holdingUtilities').value);
-        const totalHoldingCosts = (holdingTaxes + holdingInsurance + holdingPrincipal + holdingInterest + holdingUtilities) * saleTiming;
+        const totalHoldingCosts = (holdingTaxes + holdingInsurance + holdingInterest + holdingUtilities) * saleTiming;
         
         const commission = salePrice * commissionRate / 100;
         const conveyanceTax = salePrice * conveyanceRate / 100;
