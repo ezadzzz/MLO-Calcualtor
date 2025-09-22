@@ -177,6 +177,13 @@
         outline: none;
         border-color: #4299e1;
     }
+    
+    input[type="number"]:disabled, input[type="number"][readonly] {
+        background-color: #f7fafc;
+        color: #718096;
+        border-color: #e2e8f0;
+        cursor: not-allowed;
+    }
 
     .toggle-switch {
         position: relative;
@@ -419,7 +426,7 @@
                     <span class="tooltip" data-tooltip="Mandatory, two-part tax paid by the seller based on sale/exercise price. State Tax: 0.75%; Municipal Tax: 0.25%">i</span>
                 </div>
                 <div class="input-wrapper">
-                    <input type="range" id="conveyanceTax" min="1.0" max="1.0" step="0.1" value="1.0">
+                    <input type="text" id="conveyanceTax" value="1.0" readonly style="width: 60px; background-color: #f7fafc; border: 2px solid #e2e8f0; padding: 8px 12px; border-radius: 6px; text-align: center;">
                     <span class="value-display" id="conveyanceTaxValue">1.0%</span>
                 </div>
             </div>
@@ -469,7 +476,7 @@
                         <span class="tooltip" data-tooltip="Remaining mortgage balance today">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="number" id="currentBalance" value="30772" min="0" step="1000">
+                        <input type="number" id="currentBalance" value="30772" min="0" step="1">
                     </div>
                 </div>
                 
@@ -479,7 +486,7 @@
                         <span class="tooltip" data-tooltip="Annual percentage rate">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="range" id="mortgageAPR" min="0" max="10" step="0.01" value="2.68">
+                        <input type="range" id="mortgageAPR" min="0" max="3" step="0.01" value="2.68">
                         <span class="value-display" id="mortgageAPRValue">2.68%</span>
                     </div>
                 </div>
@@ -490,7 +497,7 @@
                         <span class="tooltip" data-tooltip="Principal and interest payment">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="number" id="monthlyPayment" value="1097.02" min="0" step="10">
+                        <input type="number" id="monthlyPayment" value="1097" min="0" step="10">
                     </div>
                 </div>
         </div>
@@ -507,7 +514,7 @@
                         <span class="tooltip" data-tooltip="Expected sale price">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="range" id="salePrice" min="150000" max="450000" step="5000" value="295000">
+                        <input type="range" id="salePrice" min="250000" max="310000" step="500" value="295000">
                         <span class="value-display" id="salePriceValue">$295,000</span>
                     </div>
                 </div>
@@ -518,7 +525,7 @@
                         <span class="tooltip" data-tooltip="Real estate commission percentage">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="range" id="commission" min="0" max="6" step="0.1" value="5.0">
+                        <input type="range" id="commission" min="0" max="6" step="1.0" value="5.0">
                         <span class="value-display" id="commissionValue">5.0%</span>
                     </div>
                 </div>
@@ -556,25 +563,27 @@
                             <span>Property Taxes</span>
                         </div>
                         <div class="input-wrapper">
-                            <input type="number" id="holdingTaxes" value="0" min="0" step="50">
+                            <input type="number" id="holdingTaxes" value="553" min="500" step="1">
                         </div>
                     </div>
                     
                     <div class="input-group">
                         <div class="input-label">
                             <span>Insurance</span>
+                            <span class="tooltip" data-tooltip="Auto-calculated from mortgage payment">i</span>
                         </div>
                         <div class="input-wrapper">
-                            <input type="number" id="holdingInsurance" value="0" min="0" step="25">
+                            <input type="number" id="holdingInsurance" value="142" min="0" step="1" readonly>
                         </div>
                     </div>
                     
                     <div class="input-group">
                         <div class="input-label">
                             <span>Principal</span>
+                            <span class="tooltip" data-tooltip="Auto-calculated from mortgage payment">i</span>
                         </div>
                         <div class="input-wrapper">
-                            <input type="number" id="holdingPrincipal" value="0" min="0" step="25">
+                            <input type="number" id="holdingPrincipal" value="1026" min="0" step="1" readonly>
                         </div>
                     </div>
                     
@@ -583,7 +592,7 @@
                             <span>Interest</span>
                         </div>
                         <div class="input-wrapper">
-                            <input type="number" id="holdingInterest" value="0" min="0" step="25">
+                            <input type="number" id="holdingInterest" value="71" min="0" step="1">
                         </div>
                     </div>
                     
@@ -592,7 +601,7 @@
                             <span>Utilities</span>
                         </div>
                         <div class="input-wrapper">
-                            <input type="number" id="holdingUtilities" value="0" min="0" step="25">
+                            <input type="number" id="holdingUtilities" value="50" min="0" step="1">
                         </div>
                     </div>
                 </div>
@@ -719,11 +728,11 @@
         commission: 5.0,
         fsbo: false,
         saleTiming: 0,
-        holdingTaxes: 0,
-        holdingInsurance: 0,
-        holdingPrincipal: 0,
-        holdingInterest: 0,
-        holdingUtilities: 0,
+        holdingTaxes: 553,
+        holdingInsurance: 142,
+        holdingPrincipal: 1026,
+        holdingInterest: 71,
+        holdingUtilities: 50,
         exerciseTiming: 36,
         strikePrice: 285000,
         leasePayment: 1150,
@@ -801,6 +810,31 @@
         return futureValue / Math.pow(1 + monthlyRate, months);
     }
 
+    /**
+     * Calculate dynamic Insurance and Principal values based on mortgage info
+     */
+    function calculateDynamicHoldingCosts() {
+        const monthlyPayment = parseFloat(document.getElementById('monthlyPayment').value);
+        const currentBalance = parseFloat(document.getElementById('currentBalance').value);
+        const apr = parseFloat(document.getElementById('mortgageAPR').value);
+        const saleTiming = parseInt(document.getElementById('saleTiming').value);
+        
+        // Calculate monthly insurance (assume 0.25% of current balance annually)
+        const monthlyInsurance = (currentBalance * 0.0025) / 12;
+        
+        // Calculate monthly principal payment
+        let monthlyPrincipal = 0;
+        if (saleTiming > 0) {
+            const monthlyRate = apr / 100 / 12;
+            const interest = currentBalance * monthlyRate;
+            monthlyPrincipal = Math.max(0, monthlyPayment - interest);
+        }
+        
+        // Update the readonly fields
+        document.getElementById('holdingInsurance').value = Math.round(monthlyInsurance);
+        document.getElementById('holdingPrincipal').value = Math.round(monthlyPrincipal);
+    }
+    
     /**
      * Calculate Sell Today net proceeds
      * Formula: Sale price - Commission - Conveyance tax - Attorney - Mortgage payoff - Holding costs
@@ -950,6 +984,9 @@
      * Update all calculations and displays
      */
     function updateCalculations() {
+        // First update dynamic holding costs
+        calculateDynamicHoldingCosts();
+        
         // Sell Today calculations
         const sellToday = calculateSellTodayNet();
         const sellTodayNetEl = document.getElementById('sellTodayNet');
@@ -1124,10 +1161,10 @@
             input.dispatchEvent(new Event('input'));
         });
         
-        // Number inputs
+        // Number inputs (exclude readonly fields)
         const numberInputs = [
             'attorneyFee', 'currentBalance', 'monthlyPayment', 'holdingTaxes',
-            'holdingInsurance', 'holdingPrincipal', 'holdingInterest', 'holdingUtilities', 'leasePayment', 'optionFee'
+            'holdingInterest', 'holdingUtilities', 'leasePayment', 'optionFee'
         ];
         
         numberInputs.forEach(id => {
