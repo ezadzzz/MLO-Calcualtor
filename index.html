@@ -808,6 +808,29 @@
         const apr = parseFloat(document.getElementById('mortgageAPR').value);
         const saleTiming = parseInt(document.getElementById('saleTiming').value);
         
+        // Calculate monthly interest rate
+        const monthlyRate = apr / 100 / 12;
+        
+        // Calculate interest portion for the first month (or average if saleTiming > 0)
+        let monthlyInterest;
+        if (saleTiming === 0) {
+            // Use current balance for immediate sale
+            monthlyInterest = currentBalance * monthlyRate;
+        } else {
+            // Calculate average interest over the sale timing period
+            const schedule = amortizeSchedule(currentBalance, apr, monthlyPayment);
+            let totalInterest = 0;
+            let months = Math.min(saleTiming, schedule.length);
+            
+            for (let i = 0; i < months; i++) {
+                totalInterest += schedule[i].interest;
+            }
+            
+            monthlyInterest = months > 0 ? totalInterest / months : currentBalance * monthlyRate;
+        }
+        
+        // Update the holding interest field
+        document.getElementById('holdingInterest').value = Math.round(monthlyInterest);
     }
     
     /**
