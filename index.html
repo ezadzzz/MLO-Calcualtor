@@ -1145,29 +1145,29 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
                     <span style="color: #4a5568;">Option Fee Credit</span>
-                    <span style="font-weight: 600; color: #e53e3e;">-${formatCurrency(optionFee)}</span>
+                    <span style="font-weight: 600; color: #4a5568;">-${formatCurrency(optionFee)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
                     <span style="color: #4a5568;">Improvement Credits</span>
-                    <span style="font-weight: 600; color: #e53e3e;">-${formatCurrency(improvementCredits)}</span>
+                    <span style="font-weight: 600; color: #4a5568;">-${formatCurrency(improvementCredits)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
                     <span style="color: #4a5568;">Conveyance Tax</span>
-                    <span style="font-weight: 600; color: #e53e3e;">-${formatCurrency(mlo.conveyanceTax)}</span>
+                    <span style="font-weight: 600; color: #4a5568;">-${formatCurrency(mlo.conveyanceTax)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
                     <span style="color: #4a5568;">Attorney Fee</span>
-                    <span style="font-weight: 600; color: #e53e3e;">-${formatCurrency(parseFloat(document.getElementById('attorneyFee').value))}</span>
+                    <span style="font-weight: 600; color: #4a5568;">-${formatCurrency(parseFloat(document.getElementById('attorneyFee').value))}</span>
                 </div>
                 ${mlo.mortgagePayoffAtClosing > 0 ? `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
                     <span style="color: #4a5568;">Mortgage Payoff</span>
-                    <span style="font-weight: 600; color: #e53e3e;">-${formatCurrency(mlo.mortgagePayoffAtClosing)}</span>
+                    <span style="font-weight: 600; color: #4a5568;">-${formatCurrency(mlo.mortgagePayoffAtClosing)}</span>
                 </div>
                 ` : ''}
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; margin-top: 8px; border-top: 2px solid #22c55e; font-weight: 600; font-size: 16px;">
                     <span>Net At Closing</span>
-                    <span style="color: ${mlo.closingProceeds >= 0 ? '#22c55e' : '#e53e3e'};">${formatCurrency(mlo.closingProceeds)}</span>
+                    <span style="color: ${mlo.closingProceeds >= 0 ? '#22c55e' : '#4a5568'};">${formatCurrency(mlo.closingProceeds)}</span>
                 </div>
             </div>
         `;
