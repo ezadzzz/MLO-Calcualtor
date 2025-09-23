@@ -426,7 +426,7 @@
                     <span class="tooltip" data-tooltip="Mandatory, two-part tax paid by the seller based on sale/exercise price. State Tax: 0.75%; Municipal Tax: 0.25%">i</span>
                 </div>
                 <div class="input-wrapper">
-                    <input type="text" id="conveyanceTax" value="1.0" readonly style="width: 60px; background-color: #f7fafc; border: 2px solid #e2e8f0; padding: 8px 12px; border-radius: 6px; text-align: center;">
+                    <input type="number" id="conveyanceTax" value="1.0" readonly style="width: 60px; background-color: #f7fafc; border: 2px solid #e2e8f0; padding: 8px 12px; border-radius: 6px; text-align: center;">
                     <span class="value-display" id="conveyanceTaxValue">1.0%</span>
                 </div>
             </div>
@@ -444,7 +444,7 @@
             <div class="input-group">
                 <div class="input-label">
                     <span>Discount Rate (PV)</span>
-                    <span class="tooltip" data-tooltip="Annual rate for present value calculations. Choose a rate that reflects what you could earn on the lump sum of cash if you sold today.">i</span>
+                    <span class="tooltip" data-tooltip="Annual rate for present value calculations. Choose a rate that reflects what you think you could earn on the lump sum of cash if you sold today (Tip: No plans for the sale proceeds? Just use the APY of your savings account).">i</span>
                 </div>
                 <div class="input-wrapper">
                     <input type="range" id="discountRate" min="0" max="10" step="0.1" value="3.0">
@@ -486,7 +486,7 @@
                         <span class="tooltip" data-tooltip="Annual percentage rate">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="range" id="mortgageAPR" min="0" max="3" step="0.01" value="2.68">
+                        <input type="number" id="mortgageAPR" min="0" max="3" step="0.01" value="2.68" readonly>
                         <span class="value-display" id="mortgageAPRValue">2.68%</span>
                     </div>
                 </div>
@@ -497,7 +497,7 @@
                         <span class="tooltip" data-tooltip="Principal and interest payment">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="number" id="monthlyPayment" value="1097" min="0" step="10">
+                        <input type="number" id="monthlyPayment" value="1097" min="0" step="10" readonly>
                     </div>
                 </div>
         </div>
@@ -555,43 +555,48 @@
                 </div>
             </div>
             
-            <div class="assumptions-panel">
-                <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #1a202c;">Monthly Holding Costs</h4>
-                <div class="input-grid">
-                    <div class="input-group">
-                        <div class="input-label">
-                            <span>Property Taxes</span>
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleSection('holdingCostsContent')">
+                    <span>Monthly Holding Costs</span>
+                    <span>▼</span>
+                </div>
+                <div class="collapsible-content" id="holdingCostsContent">
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <div class="input-label">
+                                <span>Property Taxes</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="holdingTaxes" value="553" min="500" step="1">
+                            </div>
                         </div>
-                        <div class="input-wrapper">
-                            <input type="number" id="holdingTaxes" value="553" min="500" step="1">
+                        
+                        <div class="input-group">
+                            <div class="input-label">
+                                <span>Insurance</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="holdingInsurance" value="142" min="0" step="1">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <div class="input-label">
-                            <span>Insurance</span>
+                        
+                        <div class="input-group">
+                            <div class="input-label">
+                                <span>Interest (Monthly Avg)</span>
+                                <span class="tooltip" data-tooltip="Auto-calculated from mortgage payment">i</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="holdingInterest" value="71" min="0" step="1" readonly>
+                            </div>
                         </div>
-                        <div class="input-wrapper">
-                            <input type="number" id="holdingInsurance" value="142" min="0" step="1">
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <div class="input-label">
-                            <span>Interest</span>
-                            <span class="tooltip" data-tooltip="Auto-calculated from mortgage payment">i</span>
-                        </div>
-                        <div class="input-wrapper">
-                            <input type="number" id="holdingInterest" value="71" min="0" step="1" readonly>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <div class="input-label">
-                            <span>Utilities</span>
-                        </div>
-                        <div class="input-wrapper">
-                            <input type="number" id="holdingUtilities" value="75" min="0" step="1">
+                        
+                        <div class="input-group">
+                            <div class="input-label">
+                                <span>Utilities</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="holdingUtilities" value="75" min="0" step="1">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -633,7 +638,7 @@
                         <span class="tooltip" data-tooltip="Option exercise price">i</span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="range" id="strikePrice" min="270000" max="300000" step="1000" value="285000">
+                        <input type="range" id="strikePrice" min="270000" max="300000" step="500" value="282500">
                         <span class="value-display" id="strikePriceValue">$282,500</span>
                     </div>
                 </div>
@@ -709,11 +714,11 @@
     const defaults = {
         conveyanceTax: 1.0,
         attorneyFee: 1500,
-        discountRate: 4.0,
+        discountRate: 3.0,
         showPV: false,
         currentBalance: 30772,
         mortgageAPR: 2.68,
-        monthlyPayment: 1097.02,
+        monthlyPayment: 1097,
         salePrice: 295000,
         commission: 5.0,
         fsbo: false,
@@ -723,7 +728,7 @@
         holdingInterest: 71,
         holdingUtilities: 75,
         exerciseTiming: 36,
-        strikePrice: 285000,
+        strikePrice: 282500,
         leasePayment: 1150,
         optionFee: 2000,
         improvementCredits: 10000
@@ -917,7 +922,7 @@
         
         const closingProceeds = strikePrice - credits - conveyanceTax - attorneyFee - mortgagePayoffAtClosing;
         
-        // Total to seller
+        // Net Proceeds to seller
         const totalToSeller = closingProceeds + interimPayments;
         
         return {
